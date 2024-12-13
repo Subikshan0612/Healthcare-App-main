@@ -1,0 +1,24 @@
+/* Global header and footer styles */
+header, footer {
+    height: 60px; /* Adjust the height as desired */
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #333;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust font size and spacing to fit within the new height */
+header h1, footer p {
+    margin: 0;
+    font-size: 18px; /* Adjust as needed */
+}
+
+/* Optional padding adjustment to align content with reduced height */
+body, main {
+    padding-top: 60px; /* Matches the header height */
+    padding-bottom: 60px; /* Matches the footer height */
+}

@@ -1,0 +1,59 @@
+/* src/components/AppointmentPreview.css */
+
+.appointments-preview-container {
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border-radius: 8px; /* Rounded corners */
+    max-width: 800px; /* Limit the width of the container */
+    margin: 20px auto; /* Center the container */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+h2 {
+    text-align: center; /* Center the heading */
+    color: #333; /* Dark color for text */
+}
+
+.appointments-list {
+    list-style-type: none; /* Remove default list styles */
+    padding: 0; /* Remove padding */
+}
+
+.appointment-item {
+    background-color: #fff; /* White background for each appointment */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Spacing inside the container */
+    margin: 10px 0; /* Space between items */
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between details and button */
+    align-items: center; /* Center align items vertically */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+    transition: box-shadow 0.3s; /* Smooth transition for hover effect */
+}
+
+.appointment-item:hover {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+.appointment-details {
+    flex-grow: 1; /* Allow details to take available space */
+}
+
+.appointment-details p {
+    margin: 5px 0; /* Space between text lines */
+}
+
+.cancel-button {
+    background-color: #d9534f; /* Bootstrap danger color */
+    color: white; /* White text for contrast */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding inside the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover */
+}
+
+.cancel-button:hover {
+    background-color: #c9302c; /* Darker red on hover */
+}
