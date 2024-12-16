@@ -1,15 +1,18 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { TextField, Button, Box, Typography, IconButton, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
-import './styles/Login.css';
+import { FcGoogle } from 'react-icons/fc'; // Google logo
+import { FaGithub } from 'react-icons/fa'; // GitHub logo
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Password visibility icons
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
@@ -42,21 +45,20 @@ const Login = () => {
         }
     };
 
-    React.useEffect(() => {
-        gsap.from(".login-container", { opacity: 0, y: -50, duration: 1 });
+    useEffect(() => {
+        gsap.from('.login-container', { opacity: 0, y: -50, duration: 1 });
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
-    
+
         if (token) {
             localStorage.setItem('token', token); // Persist token
             login(token); // Update context
             navigate('/doctor-selection'); // Redirect
         }
     }, [login, navigate]);
-    
 
     return (
         <Box
@@ -65,14 +67,14 @@ const Login = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="login-container"
-            sx={{
+            style={{
                 maxWidth: '400px',
                 margin: 'auto',
                 padding: '20px',
                 borderRadius: '8px',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
                 background: '#f9f9f9',
-                mt: 8,
+                marginTop: '8vh',
             }}
         >
             <Typography
@@ -81,7 +83,11 @@ const Login = () => {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                sx={{ mb: 2, textAlign: 'center', color: '#333' }}
+                style={{
+                    marginBottom: '20px',
+                    textAlign: 'center',
+                    color: '#333',
+                }}
             >
                 SignIn
             </Typography>
@@ -95,29 +101,35 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    sx={{ mb: 2 }}
+                    style={{ marginBottom: '16px' }}
                 />
                 <TextField
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     label="Password"
                     variant="outlined"
                     fullWidth
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    sx={{ mb: 3 }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginBottom: '24px' }}
                 />
                 <Button
                     type="submit"
                     variant="contained"
                     fullWidth
-                    sx={{
-                        background: 'linear-gradient(45deg, #2196F3, #21CBF3)',
-                        color: 'white',
-                        py: 1.5,
+                    style={{
+                        padding: '12px 0',
                         fontSize: '1rem',
                         textTransform: 'none',
-                        '&:hover': { background: '#1976D2' },
                     }}
                 >
                     SignIn
@@ -125,22 +137,64 @@ const Login = () => {
 
                 <Typography
                     variant="body2"
-                    sx={{ mt: 2, textAlign: 'center', cursor: 'pointer', color: '#2196F3' }}
+                    style={{
+                        marginTop: '16px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        color: '#2196F3',
+                    }}
                     onClick={() => navigate('/forgot-password')}
                 >
                     Forgot Password?
                 </Typography>
             </form>
 
-            <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                    <button onClick={googleLogin} style={{ marginRight: '10px', padding: '10px 20px', backgroundColor: '#DB4437', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                        Sign-in with Google
-                    </button>
-                    <button onClick={githubLogin} style={{ padding: '10px 20px', backgroundColor: '#24292e', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                        Sign-in with GitHub
-                    </button>
-                </div>
-
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '20px',
+                }}
+            >
+                <button
+                    onClick={googleLogin}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 20px',
+                        background: 'none',
+                        border: '1px solid #DB4437',
+                        borderRadius: '5px',
+                        color: '#DB4437',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        width: '48%',
+                    }}
+                >
+                    <FcGoogle size={24} />
+                    Sign-In with Google
+                </button>
+                <button
+                    onClick={githubLogin}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 20px',
+                        background: 'none',
+                        border: '1px solid #24292e',
+                        borderRadius: '5px',
+                        color: '#24292e',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        width: '48%',
+                    }}
+                >
+                    <FaGithub size={24} />
+                    Sign-In withGitHub
+                </button>
+            </div>
 
             {message && (
                 <Typography
@@ -148,7 +202,11 @@ const Login = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    sx={{ color: 'red', mt: 2, textAlign: 'center' }}
+                    style={{
+                        color: 'red',
+                        marginTop: '16px',
+                        textAlign: 'center',
+                    }}
                 >
                     {message}
                 </Typography>
@@ -158,4 +216,3 @@ const Login = () => {
 };
 
 export default Login;
-

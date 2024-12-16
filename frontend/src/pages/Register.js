@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { TextField, Button, Box, Typography, IconButton, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
-import './styles/Register.css';
+import { FcGoogle } from 'react-icons/fc'; // Google logo
+import { FaGithub } from 'react-icons/fa'; // GitHub logo
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Password visibility icons
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -12,6 +14,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [message, setMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const googleLogin = () => {
@@ -43,8 +46,8 @@ const Register = () => {
         }
     };
 
-    React.useEffect(() => {
-        gsap.from(".register-container", { opacity: 0, y: -50, duration: 1 });
+    useEffect(() => {
+        gsap.from('.register-container', { opacity: 0, y: -50, duration: 1 });
     }, []);
 
     return (
@@ -54,14 +57,14 @@ const Register = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="register-container"
-            sx={{
+            style={{
                 maxWidth: '400px',
                 margin: 'auto',
                 padding: '20px',
                 borderRadius: '8px',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
                 background: '#f9f9f9',
-                mt: 8,
+                marginTop: '8vh',
             }}
         >
             <Typography
@@ -70,7 +73,11 @@ const Register = () => {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                sx={{ mb: 2, textAlign: 'center', color: '#333' }}
+                style={{
+                    marginBottom: '20px',
+                    textAlign: 'center',
+                    color: '#333',
+                }}
             >
                 SignUp
             </Typography>
@@ -84,7 +91,7 @@ const Register = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    sx={{ mb: 2 }}
+                    style={{ marginBottom: '16px' }}
                 />
                 <TextField
                     type="email"
@@ -94,17 +101,26 @@ const Register = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    sx={{ mb: 2 }}
+                    style={{ marginBottom: '16px' }}
                 />
                 <TextField
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     label="Password"
                     variant="outlined"
                     fullWidth
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    sx={{ mb: 2 }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    style={{ marginBottom: '16px' }}
                 />
                 <TextField
                     type="text"
@@ -113,31 +129,67 @@ const Register = () => {
                     fullWidth
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    sx={{ mb: 3 }}
+                    style={{ marginBottom: '24px' }}
                 />
                 <Button
                     type="submit"
                     variant="contained"
                     fullWidth
-                    sx={{
-                        background: 'linear-gradient(45deg, #2196F3, #21CBF3)',
-                        color: 'white',
-                        py: 1.5,
+                    style={{
+                        padding: '12px 0',
                         fontSize: '1rem',
                         textTransform: 'none',
-                        '&:hover': { background: '#1976D2' },
                     }}
                 >
                     SignUp
                 </Button>
-            <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                <button onClick={googleLogin} style={{ marginRight: '10px', padding: '10px 20px', backgroundColor: '#DB4437', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                    Sign-up with Google
-                </button>
-                <button onClick={githubLogin} style={{ padding: '10px 20px', backgroundColor: '#24292e', color: '#fff', border: 'none', borderRadius: '5px' }}>
-                    Sign-up with GitHub
-                </button>
-            </div>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '20px',
+                    }}
+                >
+                    <button
+                        onClick={googleLogin}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 20px',
+                            background: 'none',
+                            border: '1px solid #DB4437',
+                            borderRadius: '5px',
+                            color: '#DB4437',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            width: '48%',
+                        }}
+                    >
+                        <FcGoogle size={24} />
+                        Sign-In with Google
+                    </button>
+                    <button
+                        onClick={githubLogin}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 20px',
+                            background: 'none',
+                            border: '1px solid #24292e',
+                            borderRadius: '5px',
+                            color: '#24292e',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            width: '48%',
+                        }}
+                    >
+                        <FaGithub size={24} />
+                        Sign-In withGitHub
+                    </button>
+                </div>
             </form>
 
             {message && (
@@ -146,7 +198,11 @@ const Register = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    sx={{ color: 'red', mt: 2, textAlign: 'center' }}
+                    style={{
+                        color: 'red',
+                        marginTop: '16px',
+                        textAlign: 'center',
+                    }}
                 >
                     {message}
                 </Typography>
@@ -156,4 +212,3 @@ const Register = () => {
 };
 
 export default Register;
-
