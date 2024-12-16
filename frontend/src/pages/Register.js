@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, IconButton, InputAdornment } from '@mui/material';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
-import { FcGoogle } from 'react-icons/fc'; // Google logo
-import { FaGithub } from 'react-icons/fa'; // GitHub logo
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Password visibility icons
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub, FaFacebook, FaLinkedin, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -23,6 +22,14 @@ const Register = () => {
 
     const githubLogin = () => {
         window.location.href = 'http://localhost:5000/api/auth/github';
+    };
+
+    const facebookLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/facebook';
+    };
+
+    const linkedinLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/linkedin';
     };
 
     const handleRegister = async (e) => {
@@ -79,7 +86,7 @@ const Register = () => {
                     color: '#333',
                 }}
             >
-                SignUp
+                Sign-Up
             </Typography>
 
             <form onSubmit={handleRegister}>
@@ -147,8 +154,10 @@ const Register = () => {
                 <div
                     style={{
                         display: 'flex',
+                        flexWrap: 'wrap',
                         justifyContent: 'space-between',
                         marginTop: '20px',
+                        gap: '10px',
                     }}
                 >
                     <button
@@ -168,7 +177,7 @@ const Register = () => {
                         }}
                     >
                         <FcGoogle size={24} />
-                        Sign-In with Google
+                        Google
                     </button>
                     <button
                         onClick={githubLogin}
@@ -187,7 +196,45 @@ const Register = () => {
                         }}
                     >
                         <FaGithub size={24} />
-                        Sign-In withGitHub
+                        GitHub
+                    </button>
+                    <button
+                        onClick={facebookLogin}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 20px',
+                            background: 'none',
+                            border: '1px solid #4267B2',
+                            borderRadius: '5px',
+                            color: '#4267B2',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            width: '48%',
+                        }}
+                    >
+                        <FaFacebook size={24} />
+                        Facebook
+                    </button>
+                    <button
+                        onClick={linkedinLogin}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 20px',
+                            background: 'none',
+                            border: '1px solid #0077B5',
+                            borderRadius: '5px',
+                            color: '#0077B5',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            width: '48%',
+                        }}
+                    >
+                        <FaLinkedin size={24} />
+                        LinkedIn
                     </button>
                 </div>
             </form>

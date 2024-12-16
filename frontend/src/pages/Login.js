@@ -6,7 +6,7 @@ import { TextField, Button, Box, Typography, IconButton, InputAdornment } from '
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { FcGoogle } from 'react-icons/fc'; // Google logo
-import { FaGithub } from 'react-icons/fa'; // GitHub logo
+import { FaGithub, FaFacebook, FaLinkedin } from 'react-icons/fa'; // Icons
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Password visibility icons
 
 const Login = () => {
@@ -23,6 +23,14 @@ const Login = () => {
 
     const githubLogin = () => {
         window.location.href = 'http://localhost:5000/api/auth/github';
+    };
+
+    const facebookLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/facebook';
+    };
+
+    const linkedinLogin = () => {
+        window.location.href = 'http://localhost:5000/api/auth/linkedin';
     };
 
     const handleLogin = async (e) => {
@@ -89,7 +97,7 @@ const Login = () => {
                     color: '#333',
                 }}
             >
-                SignIn
+                Sign-In
             </Typography>
 
             <form onSubmit={handleLogin}>
@@ -152,8 +160,10 @@ const Login = () => {
             <div
                 style={{
                     display: 'flex',
+                    flexWrap: 'wrap',
                     justifyContent: 'space-between',
                     marginTop: '20px',
+                    gap: '10px',
                 }}
             >
                 <button
@@ -169,11 +179,11 @@ const Login = () => {
                         color: '#DB4437',
                         cursor: 'pointer',
                         fontSize: '16px',
-                        width: '48%',
+                        flex: '1 1 48%',
                     }}
                 >
                     <FcGoogle size={24} />
-                    Sign-In with Google
+                    Google
                 </button>
                 <button
                     onClick={githubLogin}
@@ -188,11 +198,49 @@ const Login = () => {
                         color: '#24292e',
                         cursor: 'pointer',
                         fontSize: '16px',
-                        width: '48%',
+                        flex: '1 1 48%',
                     }}
                 >
                     <FaGithub size={24} />
-                    Sign-In withGitHub
+                    GitHub
+                </button>
+                <button
+                    onClick={facebookLogin}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 20px',
+                        background: 'none',
+                        border: '1px solid #4267B2',
+                        borderRadius: '5px',
+                        color: '#4267B2',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        flex: '1 1 48%',
+                    }}
+                >
+                    <FaFacebook size={24} />
+                    Facebook
+                </button>
+                <button
+                    onClick={linkedinLogin}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 20px',
+                        background: 'none',
+                        border: '1px solid #0077B5',
+                        borderRadius: '5px',
+                        color: '#0077B5',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        flex: '1 1 48%',
+                    }}
+                >
+                    <FaLinkedin size={24} />
+                    LinkedIn
                 </button>
             </div>
 
