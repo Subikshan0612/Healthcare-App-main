@@ -34,13 +34,13 @@ router.get(
     handleOAuthCallback
 );
 
-// // Facebook OAuth
-// router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-// router.get(
-//     '/facebook/callback',
-//     passport.authenticate('facebook', { failureRedirect: '/' }),
-//     handleOAuthCallback
-// );
+// Facebook OAuth
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get(
+    '/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/' }),
+    handleOAuthCallback
+);
 
 // LinkedIn OAuth
 router.get('/linkedin', passport.authenticate('linkedin', { scope: ['r_emailaddress', 'r_liteprofile'] }));
