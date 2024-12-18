@@ -5,6 +5,9 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const passport = require('./config/passportConfig');
 const session = require('express-session');
+const phonepeRoutes = require('./routes/phonepeRoutes');
+
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,6 +24,7 @@ app.use(express.json()); // Parse incoming JSON requests
 app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/api/phonepe', phonepeRoutes);
 
 // Route Handlers
 app.use('/api/auth', require('./routes/authRoutes'));               // Authentication routes
