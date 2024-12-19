@@ -110,8 +110,8 @@ passport.use(
         {
             clientID: process.env.LINKEDIN_CLIENT_ID,
             clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-            callbackURL: '/api/auth/linkedin/callback',
-            scope: ['r_emailaddress', 'r_liteprofile'],
+            callbackURL: process.env.LINKEDIN_CALLBACK_URL,
+            scope: ['openid','profile','email'],
         },
         async (accessToken, refreshToken, profile, done) => {
             const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
