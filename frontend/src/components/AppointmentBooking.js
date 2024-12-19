@@ -4,17 +4,17 @@ import './AppointmentBooking.css';
 
 const AppointmentBooking = () => {
     const location = useLocation();
-    const selectedDoctor = location.state?.doctor; // Get the selected doctor from the location state
+    const selectedDoctor = location.state?.doctor;
 
     // State variables
     const [date, setDate] = useState('');
     const [userEmail, setUserEmail] = useState('');
-    const [userName, setUserName] = useState(''); // Add userName state
+    const [userName, setUserName] = useState('');
     const [selectedPeriod, setSelectedPeriod] = useState('morning');
     const [error, setError] = useState('');
 
-    // Handle booking function
-    const handleBooking = async () => {
+    // Handle booking and payment function
+    const handleBookingAndPayment = async () => {
         // Validate fields
         if (!date.trim()) {
             setError('Please select a date.');
@@ -25,19 +25,20 @@ const AppointmentBooking = () => {
             return;
         }
         if (!userName.trim()) {
-            setError('Please enter your name.'); // Validate user name
+            setError('Please enter your name.');
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/appointments/book', {
+            // Booking appointment
+            const bookingResponse = await fetch('http://localhost:5000/api/appointments/book', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    doctorName: selectedDoctor.name, // Send doctor's name
-                    userName, // Send user's name
+                    doctorName: selectedDoctor.name,
+                    userName,
                     date,
                     time: selectedPeriod,
                     userEmail,
@@ -46,24 +47,41 @@ const AppointmentBooking = () => {
                 }),
             });
 
-            if (response.ok) {
+            if (bookingResponse.ok) {
                 alert('Appointment booked successfully!');
-                setDate('');
-                setUserEmail('');
-                setUserName(''); // Clear user name field
-                setSelectedPeriod('morning');
-                setError(''); // Clear error message
+
+                // Proceed to payment
+                const paymentResponse = await fetch('http://localhost:5000/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: userName,
+                        mobileNumber: '9999999999',
+                        amount: 500, // Replace with actual amount logic
+                    }),
+                });
+
+                if (paymentResponse.ok) {
+                    const paymentData = await paymentResponse.json();
+                    if (paymentData.url) {
+                        window.location.href = paymentData.url; // Redirect to payment gateway
+                    }
+                } else {
+                    const paymentError = await paymentResponse.json();
+                    setError(paymentError.message || 'Failed to initiate payment.');
+                }
             } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Failed to book appointment.');
+                const bookingError = await bookingResponse.json();
+                setError(bookingError.message || 'Failed to book appointment.');
             }
         } catch (error) {
-            console.error('Error booking appointment:', error);
+            console.error('Error:', error);
             setError('An unexpected error occurred. Please try again later.');
         }
     };
 
-    // If no doctor is selected, show a message
     if (!selectedDoctor) {
         return <p>Please select a doctor first.</p>;
     }
@@ -134,7 +152,9 @@ const AppointmentBooking = () => {
                     required
                 />
             </div>
-            <button className="book-button" onClick={handleBooking}>Book Appointment</button>
+            <button className="book-button" onClick={handleBookingAndPayment}>
+                Book Appointment & Pay
+            </button>
         </div>
     );
 };

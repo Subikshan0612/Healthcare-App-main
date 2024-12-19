@@ -1,73 +1,145 @@
-const express = require("express");
-const crypto = require("crypto");
-const axios = require("axios");
+const express = require('express');
+const axios = require('axios');
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
+
+// Constants for PhonePe Integration
+const MERCHANT_KEY = "96434309-7796-489d-8924-ab56988a6076";
+const MERCHANT_ID = "PGTESTPAYUAT86";
+const MERCHANT_BASE_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
+const MERCHANT_STATUS_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status";
+const REDIRECT_URL = "http://localhost:5000/status";
+const SUCCESS_URL = "http://localhost:3000/payment-success";
+const FAILURE_URL = "http://localhost:3000/payment-failure";
+
 const router = express.Router();
 
-const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
-const PHONEPE_MERCHANT_KEY = process.env.PHONEPE_MERCHANT_KEY;
-const PHONEPE_BASE_URL = "https://api-preprod.phonepe.com/apis/merchant-simulator"; // Use sandbox URL for testing
+// Mock database for appointments
+const appointments = [];
 
-// Generate a Payment Request
-router.post("/initiate", async (req, res) => {
-    const { amount, orderId, userPhone } = req.body;
+// Route: Create Appointment and Initiate Payment
+router.post('/create-order', async (req, res) => {
+    const { doctorName, userName, mobileNumber, date, time, userEmail, amount, specialty, location } = req.body;
 
-    // Ensure all required fields are provided
-    if (!amount || !orderId || !userPhone) {
-        return res.status(400).json({ message: "Missing required fields." });
+    if (!doctorName || !userName || !date || !time || !userEmail || !mobileNumber || !amount) {
+        return res.status(400).json({ message: 'All fields are required.' });
     }
 
+    const orderId = uuidv4(); // Unique Order ID
+
+    // Save appointment details
+    const newAppointment = {
+        id: orderId,
+        doctorName,
+        userName,
+        date,
+        time,
+        userEmail,
+        mobileNumber,
+        amount,
+        specialty,
+        location,
+        status: 'Pending',
+    };
+    appointments.push(newAppointment);
+
+    // Payment payload
+    const paymentPayload = {
+        merchantId: MERCHANT_ID,
+        merchantUserId: userName,
+        mobileNumber,
+        amount: amount * 100, // Convert to paise
+        merchantTransactionId: orderId,
+        redirectUrl: `${REDIRECT_URL}/?id=${orderId}`,
+        redirectMode: 'POST',
+        paymentInstrument: {
+            type: 'PAY_PAGE',
+        },
+    };
+
+    // Generate checksum
+    const payload = Buffer.from(JSON.stringify(paymentPayload)).toString('base64');
+    const keyIndex = 1;
+    const stringToHash = payload + '/pg/v1/pay' + MERCHANT_KEY;
+    const sha256 = crypto.createHash('sha256').update(stringToHash).digest('hex');
+    const checksum = sha256 + '###' + keyIndex;
+
+    // Request options for initiating payment
+    const options = {
+        method: 'POST',
+        url: MERCHANT_BASE_URL,
+        headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-VERIFY': checksum,
+        },
+        data: {
+            request: payload,
+        },
+    };
+
     try {
-        const payload = {
-            merchantId: PHONEPE_MERCHANT_ID,
-            merchantTransactionId: orderId,
-            merchantUserId: userPhone,
-            amount: amount * 100, // Convert to paise
-            redirectUrl: "http://localhost:3000/appointment/success", // Frontend success URL
-            callbackUrl: "http://localhost:5000/api/phonepe/callback",
-        };
+        const response = await axios.request(options);
 
-        const payloadString = JSON.stringify(payload);
-        const checksum = crypto.createHmac("sha256", PHONEPE_MERCHANT_KEY).update(payloadString).digest("base64");
-
-        const response = await axios.post(
-            `${PHONEPE_BASE_URL}/pg/v1/pay`,
-            payloadString,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-VERIFY": `${checksum}###${PHONEPE_MERCHANT_KEY.slice(-12)}`,
-                },
-            }
-        );
-
-        res.json(response.data);
+        if (response.data.data?.instrumentResponse?.redirectInfo?.url) {
+            return res.status(200).json({
+                message: 'Order created successfully!',
+                url: response.data.data.instrumentResponse.redirectInfo.url,
+                orderId,
+            });
+        } else {
+            return res.status(500).json({ message: 'Failed to initiate payment.' });
+        }
     } catch (error) {
-        console.error("Error initiating payment:", error);
-        res.status(500).json({ message: "Payment initiation failed." });
+        console.error('Error during payment initiation:', error);
+        res.status(500).json({ error: 'Payment initiation failed.' });
     }
 });
 
-// Handle Callback from PhonePe
-router.post("/callback", async (req, res) => {
-    const responseData = req.body;
+// Route: Check Payment Status
+router.post('/status', async (req, res) => {
+    const merchantTransactionId = req.query.id;
 
-    console.log("Payment Callback Response:", responseData);
-
-    // Validate response signature
-    const checksum = crypto.createHmac("sha256", PHONEPE_MERCHANT_KEY).update(JSON.stringify(responseData)).digest("base64");
-
-    if (responseData["X-VERIFY"] !== `${checksum}###${PHONEPE_MERCHANT_KEY.slice(-12)}`) {
-        return res.status(400).json({ message: "Invalid signature." });
+    if (!merchantTransactionId) {
+        return res.status(400).json({ message: 'Transaction ID is required.' });
     }
 
-    if (responseData.success) {
-        // Update booking status in your database
-        console.log("Payment successful. Booking confirmed.");
-    } else {
-        console.log("Payment failed or cancelled.");
-    }
+    // Generate checksum for payment status check
+    const keyIndex = 1;
+    const stringToHash = `/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}` + MERCHANT_KEY;
+    const sha256 = crypto.createHash('sha256').update(stringToHash).digest('hex');
+    const checksum = sha256 + '###' + keyIndex;
 
-    res.status(200).send("Callback received.");
+    // Request options for checking payment status
+    const options = {
+        method: 'GET',
+        url: `${MERCHANT_STATUS_URL}/${MERCHANT_ID}/${merchantTransactionId}`,
+        headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-VERIFY': checksum,
+            'X-MERCHANT-ID': MERCHANT_ID,
+        },
+    };
+
+    try {
+        const response = await axios.request(options);
+
+        if (response.data.success === true) {
+            // Update appointment status in mock database
+            const appointment = appointments.find(app => app.id === merchantTransactionId);
+            if (appointment) {
+                appointment.status = 'Confirmed';
+            }
+
+            return res.redirect(SUCCESS_URL);
+        } else {
+            return res.redirect(FAILURE_URL);
+        }
+    } catch (error) {
+        console.error('Error checking payment status:', error);
+        return res.redirect(FAILURE_URL);
+    }
 });
 
 module.exports = router;
