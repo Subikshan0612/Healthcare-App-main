@@ -5,7 +5,6 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const passport = require('./config/passportConfig');
 const session = require('express-session');
-const phonepeRoutes = require('../backend/routes/phonepeRoutes');
 
 
 
@@ -30,7 +29,6 @@ app.use('/api/auth', require('./routes/authRoutes'));               // Authentic
 app.use('/api/appointments', require('./routes/appointmentRoutes')); // Appointment management routes
 app.use('/api/admin', require('./routes/adminRoutes'));             // Admin management routes
 app.use('/api/search', require('./routes/searchRoutes'));           // Search functionality routes
-app.use('/api/phonepe', require('./routes/phonepeRoutes'));
 // Handle 404 errors (route not found)
 app.use((req, res) => {
     res.status(404).json({ message: 'Route not found' });

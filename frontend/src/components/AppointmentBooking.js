@@ -1,95 +1,100 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './AppointmentBooking.css';
 
 const AppointmentBooking = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const selectedDoctor = location.state?.doctor;
 
-    // State variables
     const [date, setDate] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userName, setUserName] = useState('');
     const [selectedPeriod, setSelectedPeriod] = useState('morning');
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // Handle booking and payment function
-    const handleBookingAndPayment = async () => {
-        // Validate fields
+    const validateForm = () => {
         if (!date.trim()) {
             setError('Please select a date.');
-            return;
+            return false;
         }
         if (!userEmail.trim()) {
             setError('Please enter your email.');
-            return;
+            return false;
         }
         if (!userName.trim()) {
             setError('Please enter your name.');
-            return;
+            return false;
         }
+        return true;
+    };
+
+    const handleBookingAndPayment = async () => {
+        if (!validateForm()) return;
+
+        setLoading(true);
+        setError('');
+        setSuccessMessage('');
 
         try {
-            // Booking appointment
-            const bookingResponse = await fetch('http://localhost:5000/api/appointments/book', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    doctorName: selectedDoctor.name,
-                    userName,
-                    date,
-                    time: selectedPeriod,
-                    userEmail,
-                    specialty: selectedDoctor.specialty,
-                    location: selectedDoctor.location,
-                }),
+            // Book appointment
+            const bookingResponse = await axios.post('http://localhost:5000/api/appointments/book', {
+                doctorName: selectedDoctor.name,
+                userName,
+                date,
+                time: selectedPeriod,
+                userEmail,
+                specialty: selectedDoctor.specialty,
+                location: selectedDoctor.location,
             });
 
-            if (bookingResponse.ok) {
-                alert('Appointment booked successfully!');
+            if (bookingResponse.status === 201) {
+                setSuccessMessage('Appointment booked successfully! Check your email for confirmation.');
 
-                // Proceed to payment
-                const paymentResponse = await fetch('http://localhost:5000/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: userName,
-                        mobileNumber: '9999999999',
-                        amount: 500, // Replace with actual amount logic
-                    }),
+                // Initiate payment
+                const paymentResponse = await axios.post('http://localhost:5000/create-order', {
+                    name: userName,
+                    mobileNumber: '9999999999',
+                    amount: 500,
                 });
 
-                if (paymentResponse.ok) {
-                    const paymentData = await paymentResponse.json();
-                    if (paymentData.url) {
-                        window.location.href = paymentData.url; // Redirect to payment gateway
-                    }
-                } else {
-                    const paymentError = await paymentResponse.json();
-                    setError(paymentError.message || 'Failed to initiate payment.');
+                if (paymentResponse.data.url) {
+                    window.location.href = paymentResponse.data.url;
                 }
-            } else {
-                const bookingError = await bookingResponse.json();
-                setError(bookingError.message || 'Failed to book appointment.');
             }
         } catch (error) {
+            setError(error.response?.data?.message || 'Failed to book appointment. Please try again.');
             console.error('Error:', error);
-            setError('An unexpected error occurred. Please try again later.');
+        } finally {
+            setLoading(false);
         }
     };
 
+    const getTodayDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
     if (!selectedDoctor) {
-        return <p>Please select a doctor first.</p>;
+        return <div className="error-container">Please select a doctor first.</div>;
     }
 
     return (
         <div className="appointment-booking-container">
             <h2>Book an Appointment with {selectedDoctor.name}</h2>
-            {error && <p className="error-message">{error}</p>}
+            
+            {error && <div className="error-message">{error}</div>}
+            {successMessage && <div className="success-message">{successMessage}</div>}
+            
+            <div className="doctor-info">
+                <p><strong>Specialty:</strong> {selectedDoctor.specialty}</p>
+                <p><strong>Location:</strong> {selectedDoctor.location}</p>
+                <p><strong>Hospital:</strong> {selectedDoctor.hospital}</p>
+            </div>
+
             <div className="form-group">
                 <label htmlFor="userName">Your Name:</label>
                 <input
@@ -97,9 +102,11 @@ const AppointmentBooking = () => {
                     id="userName"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
+                    placeholder="Enter your full name"
                     required
                 />
             </div>
+
             <div className="form-group">
                 <label htmlFor="date">Select Date:</label>
                 <input
@@ -107,41 +114,44 @@ const AppointmentBooking = () => {
                     id="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
+                    min={getTodayDate()}
                     required
                 />
             </div>
+
             <div className="form-group">
                 <label>Select Time Period:</label>
                 <div className="radio-group">
-                    <label>
+                    <label className="radio-label">
                         <input
                             type="radio"
                             value="morning"
                             checked={selectedPeriod === 'morning'}
                             onChange={() => setSelectedPeriod('morning')}
                         />
-                        Morning
+                        Morning (9:00 AM - 12:00 PM)
                     </label>
-                    <label>
+                    <label className="radio-label">
                         <input
                             type="radio"
                             value="afternoon"
                             checked={selectedPeriod === 'afternoon'}
                             onChange={() => setSelectedPeriod('afternoon')}
                         />
-                        Afternoon
+                        Afternoon (2:00 PM - 5:00 PM)
                     </label>
-                    <label>
+                    <label className="radio-label">
                         <input
                             type="radio"
                             value="evening"
                             checked={selectedPeriod === 'evening'}
                             onChange={() => setSelectedPeriod('evening')}
                         />
-                        Evening
+                        Evening (6:00 PM - 9:00 PM)
                     </label>
                 </div>
             </div>
+
             <div className="form-group">
                 <label htmlFor="email">Your Email:</label>
                 <input
@@ -149,11 +159,17 @@ const AppointmentBooking = () => {
                     id="email"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="Enter your email address"
                     required
                 />
             </div>
-            <button className="book-button" onClick={handleBookingAndPayment}>
-                Book Appointment & Pay
+
+            <button 
+                className="book-button" 
+                onClick={handleBookingAndPayment}
+                disabled={loading}
+            >
+                {loading ? 'Processing...' : 'Book Appointment & Pay'}
             </button>
         </div>
     );

@@ -46,7 +46,7 @@ router.get(
 router.get('/linkedin', passport.authenticate('linkedin', { scope: ['r_emailaddress', 'r_liteprofile'] }));
 router.get(
     '/linkedin/callback',
-    passport.authenticate('linkedin', { failureRedirect: '/login' }),
+    passport.authenticate('linkedin', { failureRedirect: '/' }),
     handleOAuthCallback
 );
 
