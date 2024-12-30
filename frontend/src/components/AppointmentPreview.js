@@ -30,7 +30,7 @@ const AppointmentsPreview = () => {
             });
             if (response.ok) {
                 setAppointments(appointments.filter((appointment) => appointment._id !== id));
-                alert('Appointment canceled successfully!');
+                alert('Appointment cancelled successfully!');
             } else {
                 alert('Failed to cancel appointment.');
             }
