@@ -34,36 +34,32 @@ const AppointmentBooking = () => {
 
     const handleBookingAndPayment = async () => {
         if (!validateForm()) return;
-
+    
         setLoading(true);
         setError('');
         setSuccessMessage('');
-
+    
+        // Format date to dd-mm-yyyy
+        const dateObj = new Date(date);
+        const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${dateObj.getFullYear()}`;
+    
         try {
-            // Book appointment
             const bookingResponse = await axios.post('http://localhost:5000/api/appointments/book', {
                 doctorName: selectedDoctor.name,
                 userName,
-                date,
+                date: formattedDate,
                 time: selectedPeriod,
                 userEmail,
                 specialty: selectedDoctor.specialty,
                 location: selectedDoctor.location,
+                hospital: selectedDoctor.hospital,
             });
-
+    
             if (bookingResponse.status === 201) {
                 setSuccessMessage('Appointment booked successfully! Check your email for confirmation.');
-
-                // Initiate payment
-                const paymentResponse = await axios.post('http://localhost:5000/create-order', {
-                    name: userName,
-                    mobileNumber: '9999999999',
-                    amount: 500,
-                });
-
-                if (paymentResponse.data.url) {
-                    window.location.href = paymentResponse.data.url;
-                }
+                setTimeout(() => {
+                    navigate('/appointment-preview');
+                }, 3000);
             }
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to book appointment. Please try again.');
@@ -72,6 +68,26 @@ const AppointmentBooking = () => {
             setLoading(false);
         }
     };
+                
+
+                // // Initiate payment
+                // const paymentResponse = await axios.post('http://localhost:5000/create-order', {
+                //     name: userName,
+                //     mobileNumber: '9999999999',
+                //     amount: 500,
+                // });
+
+                // if (paymentResponse.data.url) {
+                //     window.location.href = paymentResponse.data.url;
+                // }
+    //         }
+    //     } catch (error) {
+    //         setError(error.response?.data?.message || 'Failed to book appointment. Please try again.');
+    //         console.error('Error:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const getTodayDate = () => {
         const today = new Date();

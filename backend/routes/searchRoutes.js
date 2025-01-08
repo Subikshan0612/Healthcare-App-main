@@ -35,4 +35,25 @@ router.get('/', (req, res) => {
     res.status(200).json(results); // Return the filtered results
 });
 
+//routes for dropdown
+router.get('/options', (req, res) => {
+    const options = {
+        specialties: [...new Set(data.map(item => item.specialty))],
+        locations: [...new Set(data.map(item => item.location))],
+        areas: [...new Set(data.map(item => item.area))],
+        hospitals: [...new Set(data.map(item => item.hospital))]
+    };
+    res.json(options);
+});
+
+// for areas
+router.get('/areas', (req, res) => {
+    const { location } = req.query;
+    const areas = data
+        .filter(item => item.location === location)
+        .map(item => item.area);
+    const uniqueAreas = [...new Set(areas)];
+    res.json(uniqueAreas);
+});
+
 module.exports = router;

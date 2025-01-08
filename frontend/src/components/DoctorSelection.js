@@ -9,24 +9,26 @@ const DoctorSelection = () => {
     const navigate = useNavigate();
     const [specialtyFilter, setSpecialtyFilter] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
+    const [hospitalFilter, setHospitalFilter] = useState('');
+
     const { login } = useContext(AuthContext);
 
     const doctors = [
-        { id: '63f847f5e152fa29e074aa21', name: 'Dr. K.Suma', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad' },
-        { id: '63f847f5e152fa29e074aa22', name: 'Dr. G.Keertana Reddy', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad' },
-        { id: '63f847f5e152fa29e074aa23', name: 'Dr. Roopa Ghanta', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad' },
-        { id: '63f847f5e152fa29e074aa24', name: 'Dr. Anupama', specialty: 'Orthopedic', location: 'Hyderabad' },
-        { id: '63f847f5e152fa29e074aa25', name: 'Dr. Padmavati Kapila', specialty: 'Pediatrician', location: 'Hyderabad' },
-         { id: '63f847f5e152fa29e074aa26', name: 'Dr. Sreelatha Jella', specialty: 'Psychiatrist', location: 'Bangalore' },
-         { id: '63f847f5e152fa29e074aa27', name: 'Dr. Archana Agarwal', specialty: 'Cardiologist', location: 'Bangalore' },
-        { id: '63f847f5e152fa29e074aa28', name: 'Dr. Rashmi Swaroop', specialty: 'Orthopedic', location: 'Bangalore' },
-         { id: '63f847f5e152fa29e074aa29', name: 'Dr. Rashmi Vasanth', specialty: 'Psychiatrist', location: 'Bangalore' },
-         { id: '63f847f5e152fa29e074aa2a', name: 'Dr. M.Gowri', specialty: 'Obstetrics & Gynaecology', location: 'Bangalore' },
-         { id: '63f847f5e152fa29e074aa2b', name: 'Dr. Triveni M P', specialty: 'Cardiologist', location: 'Chennai' },
-         { id: '63f847f5e152fa29e074aa2c', name: 'Dr. Harini P Shetty', specialty: 'Dentist', location: 'Chennai' },
-         { id: '63f847f5e152fa29e074aa2d', name: 'Dr. Bhargavi Reddy', specialty: 'Pediatrician', location: 'Chennai' },
-         { id: '63f847f5e152fa29e074aa2e', name: 'Dr. Anilasre Atluri', specialty: 'Dermatologist', location: 'Chennai' },
-         { id: '63f847f5e152fa29e074aa2f', name: 'Dr. S.Samundi Sankari', specialty: 'Psychiatrist', location: 'Chennai' },
+        { id: '63f847f5e152fa29e074aa21', name: 'Dr. K.Suma', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad', area: 'Ameerpet', hospital: 'Apollo, Hyderabad', description: 'MBBS, DGO' },
+        { id: '63f847f5e152fa29e074aa22', name: 'Dr. G.Keertana Reddy', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad', area: 'Sanathnagar', hospital: 'Apollo, Hyderabad', description: 'MBBS, DGO' },
+        { id: '63f847f5e152fa29e074aa23', name:'Dr. Roopa Ghanta', specialty: 'Obstetrics & Gynaecology', location: 'Hyderabad', area: 'Khairatabad', hospital: 'Apollo, Hyderabad', description: 'MBBS, DGO' },
+        { id: '63f847f5e152fa29e074aa25', name: 'Dr. Anupama', specialty: 'Orthopedic', location: 'Hyderabad', area: 'Nampally', hospital: 'Apollo, Hyderabad', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa26', name: 'Dr. Padmavati Kapila', specialty: 'Pediatrician', location: 'Hyderabad', area: 'Secunderabad', hospital: 'Apollo, Hyderabad', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa27', name: 'Dr. Sreelatha Jella', specialty: 'Psychiatrist', location: 'Bangalore', area: 'Jayanagar', hospital: 'Apollo, Bangalore', description: 'MBBS, DGO' },
+        { id: '63f847f5e152fa29e074aa28', name: 'Dr. Archana Agarwal', specialty: 'Cardiologist', location: 'Bangalore', area: 'Koramangala', hospital: 'Apollo, Bangalore', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa29', name: 'Dr. Rashmi Swaroop', specialty: 'Orthopedics', location: 'Bangalore', area: 'Malleshwaram', hospital: 'Apollo, Bangalore', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2a', name: 'Dr. Rashmi Vasanth', specialty: 'Psychiatrist', location: 'Bangalore', area: 'Whitefield', hospital: 'Apollo, Bangalore', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2b', name: 'Dr. M.Gowri', specialty: 'Obstetrics & Gynaecology', location: 'Bangalore', area: 'Electronic City', hospital: 'Apollo, Bangalore', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2c', name: 'Dr. Triveni M P', specialty: 'Cardiologist', location: 'Chennai', area: 'Nungambakkam', hospital: 'Apollo, Chennai', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2d', name: 'Dr. Harini P Shetty', specialty: 'Dentist', location: 'Chennai', area: 'Kodambakkam', hospital: 'Apollo, Chennai', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2e', name: 'Dr. Bhargavi Reddy', specialty: 'Pediatrician', location: 'Chennai', area: 'T.Nagar', hospital: 'Apollo, Chennai', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2f', name: 'Dr. Anilasre Atluri', specialty: 'Dermatologist', location: 'Chennai', area: 'Chetpet', hospital: 'Apollo, Chennai', description: 'MBBS, DGO' },
+         { id: '63f847f5e152fa29e074aa2g', name: 'Dr. S.Samundi Sankari', specialty: 'Psychiatrist', location: 'Chennai', area: 'Pudupet', hospital: 'KMCH, Chennai', description: 'MBBS, DGO' },
     ];
 
     const handleSelectDoctor = (doctor) => {
@@ -35,7 +37,8 @@ const DoctorSelection = () => {
 
     const filteredDoctors = doctors.filter((doctor) =>
         (specialtyFilter ? doctor.specialty.toLowerCase().includes(specialtyFilter.toLowerCase()) : true) &&
-        (locationFilter ? doctor.location.toLowerCase().includes(locationFilter.toLowerCase()) : true)
+        (locationFilter ? doctor.location.toLowerCase().includes(locationFilter.toLowerCase()) : true) &&
+        (hospitalFilter ? doctor.hospital.toLowerCase().includes(hospitalFilter.toLowerCase()) : true)
     );
 
     React.useEffect(() => {
@@ -89,6 +92,13 @@ const DoctorSelection = () => {
                     onChange={(e) => setLocationFilter(e.target.value)}
                     sx={{ width: '300px' }}
                 />
+                <TextField
+                    label="Filter by Hospital"
+                    variant="outlined"
+                    value={hospitalFilter}
+                    onChange={(e) => setHospitalFilter(e.target.value)}
+                    sx={{ width: '300px' }}
+                />
             </Box>
 
             <Grid container spacing={3} justifyContent="center">
@@ -118,6 +128,9 @@ const DoctorSelection = () => {
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#ffffff', opacity: 0.8, mb: 2 }}>
                                 Location: {doctor.location}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#ffffff', opacity: 0.8 }}>
+                                Hospital: {doctor.hospital}
                             </Typography>
                             <Button
                                 variant="contained"
